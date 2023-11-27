@@ -14,11 +14,11 @@ public class MessagingService {
 	
 	public MessageResponse sendMessage(MessageRequest request) {
 		Instant now = Instant.now();
-		log.info("Received message from {}: {}", request.getSender(), request.getContent());
+		log.info("Received message from {}: {}", request.getSender().getName(), request.getContent());
 		
 		return MessageResponse.newBuilder()
-				.setContent("Hi " + request.getSender() + ", I'm server!")
-				.setRecipient(request.getSender())
+				.setContent("Hi " + request.getSender().getName() + ", I'm server!")
+				.setRecipient(request.getSender().getName())
 				.setReadTime(TimeUtils.convertToTimestamp(now))
 				.build();
 	}

@@ -3,9 +3,7 @@ package dev.federicopellegatta.clientservice.service;
 import dev.federicopellegatta.clientservice.component.MessageMapper;
 import dev.federicopellegatta.clientservice.dto.MessageClientRequest;
 import dev.federicopellegatta.clientservice.dto.MessageClientResponse;
-import dev.federicopellegatta.messaging.MessageRequest;
-import dev.federicopellegatta.messaging.MessageResponse;
-import dev.federicopellegatta.messaging.MessagingServiceGrpc;
+import dev.federicopellegatta.messaging.*;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +62,7 @@ public class MessagingService {
 		
 		IntStream.range(0, 100)
 				.mapToObj(i -> MessageRequest.newBuilder()
-						.setSender("Client")
+						.setSender(Person.newBuilder().setName("Client").setAge(30).setGender(Gender.FEMALE).build())
 						.setContent("This is the message number " + i + " from client")
 						.setSendTime(TimeUtils.convertToTimestamp(Instant.now()))
 						.build())

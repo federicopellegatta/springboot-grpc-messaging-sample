@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 // Message request definition
 message MessageRequest {
-  string sender = 1;
+  Person sender = 1;
   string content = 2;
   google.protobuf.Timestamp send_time = 3;
 }
@@ -20,6 +20,17 @@ message MessageResponse {
   google.protobuf.Timestamp read_time = 3;
 }
 
+message Person {
+  string name = 1;
+  optional int32 age = 2;
+  optional Gender gender = 3;
+}
+
+enum Gender {
+  MALE = 0;
+  FEMALE = 1;
+}
+
 // Messaging service definition
 service MessagingService {
 
@@ -27,5 +38,5 @@ service MessagingService {
   rpc sendMessage(MessageRequest) returns (MessageResponse);
 
   // asynchronous method (bi-directional): client sends a stream of messages and receives a stream of responses
-   rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
+  rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
 }

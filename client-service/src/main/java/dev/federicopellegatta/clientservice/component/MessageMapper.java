@@ -2,8 +2,10 @@ package dev.federicopellegatta.clientservice.component;
 
 import dev.federicopellegatta.clientservice.dto.MessageClientRequest;
 import dev.federicopellegatta.clientservice.dto.MessageClientResponse;
+import dev.federicopellegatta.clientservice.dto.PersonClient;
 import dev.federicopellegatta.messaging.MessageRequest;
 import dev.federicopellegatta.messaging.MessageResponse;
+import dev.federicopellegatta.messaging.Person;
 import org.springframework.stereotype.Component;
 import utils.TimeUtils;
 
@@ -11,17 +13,11 @@ import java.time.LocalDateTime;
 
 @Component
 public class MessageMapper {
-	public MessageClientRequest toClientRequest(MessageRequest messageRequest) {
-		return MessageClientRequest.builder()
-				.content(messageRequest.getContent())
-				.sender(messageRequest.getSender())
-				.build();
-	}
 	
 	public MessageRequest toServerRequest(MessageClientRequest messageClientRequest) {
 		return MessageRequest.newBuilder()
 				.setContent(messageClientRequest.getContent())
-				.setSender(messageClientRequest.getSender())
+				.setSender(toPersonServer(messageClientRequest.getSender()))
 				.setSendTime(TimeUtils.convertToTimestamp(LocalDateTime.now()))
 				.build();
 	}
@@ -34,11 +30,11 @@ public class MessageMapper {
 				.build();
 	}
 	
-	public MessageResponse toServerResponse(MessageClientResponse messageClientResponse) {
-		return MessageResponse.newBuilder()
-				.setContent(messageClientResponse.getContent())
-				.setRecipient(messageClientResponse.getRecipient())
-				.setReadTime(TimeUtils.convertToTimestamp(messageClientResponse.getReadTime()))
+	private Person toPersonServer(PersonClient sender) {
+		return Person.newBuilder()
+				.setName(sender.getName())
+				.setAge(sender.getAge())
+				.setGender(sender.getGender())
 				.build();
 	}
 }
