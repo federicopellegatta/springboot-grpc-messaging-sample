@@ -1,12 +1,12 @@
 package dev.federicopellegatta.serverservice.service;
 
-import com.google.protobuf.Timestamp;
 import dev.federicopellegatta.messaging.MessageRequest;
 import dev.federicopellegatta.messaging.MessageResponse;
 import dev.federicopellegatta.messaging.MessagingServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import utils.TimeUtils;
 
 import java.time.Instant;
 
@@ -21,7 +21,7 @@ public class MessagingService extends MessagingServiceGrpc.MessagingServiceImplB
 		MessageResponse response = MessageResponse.newBuilder()
 				.setContent("Hi " + request.getSender() + ", I'm server!")
 				.setRecipient(request.getSender())
-				.setReadTime(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()).build())
+				.setReadTime(TimeUtils.convertToTimestamp(now))
 				.build();
 		
 		responseObserver.onNext(response);
