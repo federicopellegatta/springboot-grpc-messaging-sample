@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package dev.federicopellegatta.messaging;
+
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+
+// Message request definition
+message MessageRequest {
+  string sender = 1;
+  string content = 2;
+  google.protobuf.Timestamp send_time = 3;
+}
+
+// Message response definition
+message MessageResponse {
+  string recipient = 1;
+  string content = 2;
+  google.protobuf.Timestamp read_time = 3;
+}
+
+// Messaging service definition
+service MessagingService {
+
+  // synchronous method (unary): client sends a message and waits for a response
+  rpc sendMessage(MessageRequest) returns (MessageResponse);
+
+  // asynchronous method (bi-directional): client sends a stream of messages and receives a stream of responses
+  // rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
+}
