@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>grpc-interface</module>
+        <module>server-service</module>
     </modules>
 
     <properties>
