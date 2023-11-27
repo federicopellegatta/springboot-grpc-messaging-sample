@@ -9,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @GrpcService
 @Slf4j
 @AllArgsConstructor
@@ -21,5 +24,29 @@ public class MessagingGrpcController extends MessagingServiceGrpc.MessagingServi
 		
 		responseObserver.onNext(messagingService.sendMessage(request));
 		responseObserver.onCompleted();
+	}
+	
+	@Override
+	public StreamObserver<MessageRequest> sendMessageStream(StreamObserver<MessageResponse> responseObserver) {
+		List<MessageResponse> messageResponses = new ArrayList<>();
+		
+		return new StreamObserver<>() {
+			@Override
+			public void onNext(MessageRequest request) {
+				messageResponses.add(messagingService.sendMessage(request));
+			}
+			
+			@Override
+			public void onError(Throwable throwable) {
+				log.error("Error in sendMessageStream", throwable);
+				responseObserver.onError(throwable);
+			}
+			
+			@Override
+			public void onCompleted() {
+				messageResponses.forEach(responseObserver::onNext);
+				responseObserver.onCompleted();
+			}
+		};
 	}
 }

@@ -27,5 +27,5 @@ service MessagingService {
   rpc sendMessage(MessageRequest) returns (MessageResponse);
 
   // asynchronous method (bi-directional): client sends a stream of messages and receives a stream of responses
-  // rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
+   rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
 }
