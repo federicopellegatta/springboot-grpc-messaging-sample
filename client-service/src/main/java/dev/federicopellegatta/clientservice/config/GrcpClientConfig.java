@@ -20,4 +20,9 @@ public class GrcpClientConfig {
 	public MessagingServiceGrpc.MessagingServiceBlockingStub messagingServiceBlockingStub(ManagedChannel channel) {
 		return MessagingServiceGrpc.newBlockingStub(channel);
 	}
+	
+	@Bean
+	public MessagingServiceGrpc.MessagingServiceStub messagingServiceStub(ManagedChannel channel) {
+		return MessagingServiceGrpc.newStub(channel);
+	}
 }
