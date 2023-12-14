@@ -2,15 +2,13 @@ package dev.federicopellegatta.clientservice.controller;
 
 import dev.federicopellegatta.clientservice.dto.MessageClientRequest;
 import dev.federicopellegatta.clientservice.dto.MessageClientResponse;
+import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
 import dev.federicopellegatta.clientservice.service.MessagingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -23,6 +21,14 @@ public class MessagingController {
 	@PostMapping(value = "/send", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<MessageClientResponse> sendMessage(@RequestBody MessageClientRequest messageClientRequest) {
 		return new ResponseEntity<>(messagingService.sendMessage(messageClientRequest), HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/collect-messages-by-sender")
+	public ResponseEntity<MessagesBySenderResponse> collectMessagesBySender(
+			@RequestParam(value = "numberOfSenders", required = false, defaultValue = "3") int numberOfSenders,
+			@RequestParam(value = "numberOfMessages", required = false, defaultValue = "5") int numberOfMessages) {
+		return new ResponseEntity<>(messagingService.collectMessagesBySender(numberOfSenders, numberOfMessages),
+		                            HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/send-stream")

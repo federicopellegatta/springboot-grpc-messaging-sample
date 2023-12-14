@@ -3,6 +3,7 @@ package dev.federicopellegatta.clientservice.service;
 import dev.federicopellegatta.clientservice.component.MessageMapper;
 import dev.federicopellegatta.clientservice.dto.MessageClientRequest;
 import dev.federicopellegatta.clientservice.dto.MessageClientResponse;
+import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
 import dev.federicopellegatta.messaging.*;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -33,6 +35,56 @@ public class MessagingService {
 		MessageResponse serverResponse = messagingServiceBlockingStub.sendMessage(serverRequest);
 		
 		return messageMapper.toClientResponse(serverResponse);
+	}
+	
+	
+	public MessagesBySenderResponse collectMessagesBySender(int numberOfSenders, int numberOfMessages) {
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		
+		MessagesBySenderResponse messagesBySenderResponse = new MessagesBySenderResponse();
+		
+		StreamObserver<MessageRequest> messageRequestStreamObserver =
+				messagingServiceStub.collectMessagesBySender(new StreamObserver<>() {
+					@Override
+					public void onNext(BatchedMessagesResponse batchedMessagesResponse) {
+						messagesBySenderResponse.setSenderMessagesPairs(
+								messageMapper.toClientResponse(batchedMessagesResponse.getSenderMessagesList()));
+					}
+					
+					@Override
+					public void onError(Throwable throwable) {
+						log.error("Error in collectMessagesBySender", throwable);
+						countDownLatch.countDown();
+					}
+					
+					@Override
+					public void onCompleted() {
+						countDownLatch.countDown();
+					}
+				});
+		
+		List<Person> randomSenders = IntStream.range(0, numberOfSenders)
+				.mapToObj(i -> new RandomGenerator().person())
+				.collect(Collectors.toList());
+		
+		IntStream.range(0, numberOfMessages)
+				.mapToObj(i -> MessageRequest.newBuilder()
+						.setSender(RandomGenerator.pickRandom(randomSenders))
+						.setContent(new RandomGenerator().message())
+						.setSendTime(TimeUtils.convertToTimestamp(Instant.now()))
+						.build())
+				.forEach(messageRequestStreamObserver::onNext);
+		messageRequestStreamObserver.onCompleted();
+		
+		boolean isCountdownComplete = false;
+		try {
+			isCountdownComplete = countDownLatch.await(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			log.error("Countdown was interrupted: " + e.getMessage());
+			// Restore interrupted state...
+			Thread.currentThread().interrupt();
+		}
+		return isCountdownComplete ? messagesBySenderResponse : new MessagesBySenderResponse();
 	}
 	
 	public Collection<MessageClientResponse> sendMessageStream() {
