@@ -20,6 +20,17 @@ message MessageResponse {
   google.protobuf.Timestamp read_time = 3;
 }
 
+// Response for client-streaming service
+message BatchedMessagesResponse {
+  repeated SenderMessagesPair senderMessages = 1;
+}
+
+// Pair of sender and messages
+message SenderMessagesPair {
+  Person sender = 1;
+  repeated string messages = 2;
+}
+
 message Person {
   string name = 1;
   optional int32 age = 2;
@@ -36,6 +47,9 @@ service MessagingService {
 
   // synchronous method (unary): client sends a message and waits for a response
   rpc sendMessage(MessageRequest) returns (MessageResponse);
+
+  // asynchronous method (client-streaming method): client sends multiple messages and receives a combined response
+  rpc collectMessagesBySender(stream MessageRequest) returns (BatchedMessagesResponse);
 
   // asynchronous method (bi-directional): client sends a stream of messages and receives a stream of responses
   rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);
