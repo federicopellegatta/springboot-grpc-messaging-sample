@@ -2,14 +2,12 @@ package dev.federicopellegatta.serverservice.controller;
 
 import dev.federicopellegatta.messaging.*;
 import dev.federicopellegatta.serverservice.service.MessagingService;
-import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +27,7 @@ public class MessagingGrpcController extends MessagingServiceGrpc.MessagingServi
 	
 	@Override
 	public StreamObserver<MessageRequest> collectMessagesBySender(
-			StreamObserver<BatchedMessagesResponse> responseObserver) {
+			StreamObserver<GroupedMessagesResponse> responseObserver) {
 		return new StreamObserver<>() {
 			final List<SenderMessagesPair> senderMessagesPairs = new ArrayList<>();
 			
@@ -54,13 +52,13 @@ public class MessagingGrpcController extends MessagingServiceGrpc.MessagingServi
 			
 			@Override
 			public void onError(Throwable throwable) {
-				log.error("Error in sendBatchedMessages", throwable);
+				log.error("Error in collectMessagesBySender", throwable);
 				responseObserver.onError(throwable);
 			}
 			
 			@Override
 			public void onCompleted() {
-				responseObserver.onNext(BatchedMessagesResponse.newBuilder()
+				responseObserver.onNext(GroupedMessagesResponse.newBuilder()
 						                        .addAllSenderMessages(senderMessagesPairs)
 						                        .build());
 				responseObserver.onCompleted();

@@ -46,9 +46,9 @@ public class MessagingService {
 		StreamObserver<MessageRequest> messageRequestStreamObserver =
 				messagingServiceStub.collectMessagesBySender(new StreamObserver<>() {
 					@Override
-					public void onNext(BatchedMessagesResponse batchedMessagesResponse) {
+					public void onNext(GroupedMessagesResponse groupedMessagesResponse) {
 						messagesBySenderResponse.setSenderMessagesPairs(
-								messageMapper.toClientResponse(batchedMessagesResponse.getSenderMessagesList()));
+								messageMapper.toClientResponse(groupedMessagesResponse.getSenderMessagesList()));
 					}
 					
 					@Override
