@@ -18,7 +18,9 @@ communication methods.
    communication protocol.
 
 3. **Various Service Types:** Explores and implements different gRPC service types, such as synchronous unary calls,
-   client-streaming, and bidirectional streaming methods, showcasing their diverse functionalities.
+   client-streaming, and bidirectional streaming methods, showcasing their diverse functionalities. For an alternative
+   implementation using reactive programming techniques, switch to the `reactive_grpc` branch. This branch demonstrates
+   the same functionalities but leverages reactive paradigms for implementation.
 
 4. **Practical Start-Up Guide:** Provides a straightforward process to start the application, enabling developers to
    quickly set up and run the gRPC-powered Spring Boot project.
