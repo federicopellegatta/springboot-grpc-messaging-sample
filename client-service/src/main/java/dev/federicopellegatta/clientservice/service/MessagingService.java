@@ -4,15 +4,17 @@ import dev.federicopellegatta.clientservice.component.MessageMapper;
 import dev.federicopellegatta.clientservice.dto.MessageClientRequest;
 import dev.federicopellegatta.clientservice.dto.MessageClientResponse;
 import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
-import dev.federicopellegatta.messaging.*;
+import dev.federicopellegatta.messaging.MessageRequest;
+import dev.federicopellegatta.messaging.Person;
+import dev.federicopellegatta.messaging.ReactorMessagingServiceGrpc;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import utils.TimeUtils;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,16 +26,15 @@ public class MessagingService {
 	private final ReactorMessagingServiceGrpc.ReactorMessagingServiceStub reactorMessagingServiceStub;
 	private final MessageMapper messageMapper;
 	
-	public MessageClientResponse sendMessage(MessageClientRequest messageClientRequest) {
+	public Mono<MessageClientResponse> sendMessage(MessageClientRequest messageClientRequest) {
 		MessageRequest serverRequest = messageMapper.toServerRequest(messageClientRequest);
 		
 		return reactorMessagingServiceStub.sendMessage(serverRequest)
-				.map(messageMapper::toClientResponse)
-				.block();
+				.map(messageMapper::toClientResponse);
 	}
 	
 	
-	public MessagesBySenderResponse collectMessagesBySender(int numberOfSenders, int numberOfMessages) {
+	public Mono<MessagesBySenderResponse> collectMessagesBySender(int numberOfSenders, int numberOfMessages) {
 		List<Person> randomSenders = IntStream.range(0, numberOfSenders)
 				.mapToObj(i -> new RandomGenerator().person())
 				.collect(Collectors.toList());
@@ -53,11 +54,10 @@ public class MessagingService {
 							messageMapper.toClientResponse(groupedMessagesResponse.getSenderMessagesList());
 					return new MessagesBySenderResponse(clientResponse);
 				})
-				.doOnError(error -> log.error("Error in collectMessagesBySender", error))
-				.block();
+				.doOnError(error -> log.error("Error in collectMessagesBySender", error));
 	}
 	
-	public Collection<MessageClientResponse> sendMessageStream() {
+	public Flux<MessageClientResponse> sendMessageStream() {
 		Flux<MessageRequest> messageRequestFlux = Flux.fromStream(
 				IntStream.range(0, 100)
 						.mapToObj(i -> MessageRequest.newBuilder()
@@ -69,8 +69,6 @@ public class MessagingService {
 		
 		return reactorMessagingServiceStub.sendMessageStream(messageRequestFlux)
 				.map(messageMapper::toClientResponse)
-				.collectList()
-				.doOnError(error -> log.error("Error in sendMessageStream", error))
-				.block();
+				.doOnError(error -> log.error("Error in sendMessageStream", error));
 	}
 }

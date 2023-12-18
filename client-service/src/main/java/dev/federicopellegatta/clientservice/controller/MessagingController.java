@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/messaging")
@@ -19,12 +19,13 @@ public class MessagingController {
 	private final MessagingService messagingService;
 	
 	@PostMapping(value = "/send", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<MessageClientResponse> sendMessage(@RequestBody MessageClientRequest messageClientRequest) {
+	public ResponseEntity<Mono<MessageClientResponse>> sendMessage(
+			@RequestBody MessageClientRequest messageClientRequest) {
 		return new ResponseEntity<>(messagingService.sendMessage(messageClientRequest), HttpStatus.CREATED);
 	}
 	
 	@PostMapping(value = "/collect-messages-by-sender")
-	public ResponseEntity<MessagesBySenderResponse> collectMessagesBySender(
+	public ResponseEntity<Mono<MessagesBySenderResponse>> collectMessagesBySender(
 			@RequestParam(value = "numberOfSenders", required = false, defaultValue = "3") int numberOfSenders,
 			@RequestParam(value = "numberOfMessages", required = false, defaultValue = "5") int numberOfMessages) {
 		return new ResponseEntity<>(messagingService.collectMessagesBySender(numberOfSenders, numberOfMessages),
@@ -32,7 +33,7 @@ public class MessagingController {
 	}
 	
 	@PostMapping("/send-stream")
-	public ResponseEntity<Collection<MessageClientResponse>> sendMessageStream() {
+	public ResponseEntity<Flux<MessageClientResponse>> sendMessageStream() {
 		return new ResponseEntity<>(messagingService.sendMessageStream(), HttpStatus.CREATED);
 	}
 }
