@@ -47,4 +47,11 @@ public class MessagingReactiveGrpcController extends ReactorMessagingServiceGrpc
 						.build())
 				.doOnError(error -> log.error("Error in collectMessagesBySender", error));
 	}
+	
+	@Override
+	public Flux<MessageResponse> sendMessageStream(Flux<MessageRequest> request) {
+		return request
+				.map(messagingService::sendMessage)
+				.doOnError(error -> log.error("Error in sendMessageStream", error));
+	}
 }
