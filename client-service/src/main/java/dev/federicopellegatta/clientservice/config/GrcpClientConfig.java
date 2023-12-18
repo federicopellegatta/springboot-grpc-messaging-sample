@@ -1,6 +1,6 @@
 package dev.federicopellegatta.clientservice.config;
 
-import dev.federicopellegatta.messaging.MessagingServiceGrpc;
+import dev.federicopellegatta.messaging.ReactorMessagingServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +17,7 @@ public class GrcpClientConfig {
 	}
 	
 	@Bean
-	public MessagingServiceGrpc.MessagingServiceBlockingStub messagingServiceBlockingStub(ManagedChannel channel) {
-		return MessagingServiceGrpc.newBlockingStub(channel);
-	}
-	
-	@Bean
-	public MessagingServiceGrpc.MessagingServiceStub messagingServiceStub(ManagedChannel channel) {
-		return MessagingServiceGrpc.newStub(channel);
+	public ReactorMessagingServiceGrpc.ReactorMessagingServiceStub reactorMessagingServiceStub(ManagedChannel channel) {
+		return ReactorMessagingServiceGrpc.newReactorStub(channel);
 	}
 }
