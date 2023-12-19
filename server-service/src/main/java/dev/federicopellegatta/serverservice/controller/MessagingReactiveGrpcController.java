@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import utils.TimeUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,19 @@ public class MessagingReactiveGrpcController extends ReactorMessagingServiceGrpc
 						.addAllSenderMessages(senderMessagesPairs)
 						.build())
 				.doOnError(error -> log.error("Error in collectMessagesBySender", error));
+	}
+	
+	@Override
+	public Flux<MessageResponse> sendMessageToAll(Mono<RecipientsRequest> request) {
+		return request
+				.map(RecipientsRequest::getRecipientsList)
+				.flatMapMany(Flux::fromIterable)
+				.map(recipient -> MessageResponse.newBuilder()
+						.setRecipient(recipient.getName())
+						.setContent("Hi " + recipient.getName() + ", I'm server!")
+						.setReadTime(TimeUtils.convertToTimestamp(Instant.now()))
+						.build())
+				.doOnError(error -> log.error("Error in sendMessageToAll", error));
 	}
 	
 	@Override

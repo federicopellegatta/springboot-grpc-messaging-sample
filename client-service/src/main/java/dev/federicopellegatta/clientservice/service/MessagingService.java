@@ -7,6 +7,7 @@ import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
 import dev.federicopellegatta.messaging.MessageRequest;
 import dev.federicopellegatta.messaging.Person;
 import dev.federicopellegatta.messaging.ReactorMessagingServiceGrpc;
+import dev.federicopellegatta.messaging.RecipientsRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,20 @@ public class MessagingService {
 					return new MessagesBySenderResponse(clientResponse);
 				})
 				.doOnError(error -> log.error("Error in collectMessagesBySender", error));
+	}
+	
+	public Flux<MessageClientResponse> sendMessageToAll(int numberOfRecipient) {
+		RecipientsRequest recipientsRequest = RecipientsRequest.newBuilder()
+				.addAllRecipients(
+						IntStream.range(0, numberOfRecipient)
+								.mapToObj(i -> new RandomGenerator().person())
+								.collect(Collectors.toList())
+				)
+				.build();
+		
+		return reactorMessagingServiceStub.sendMessageToAll(Mono.just(recipientsRequest))
+				.map(messageMapper::toClientResponse)
+				.doOnError(error -> log.error("Error in sendMessageToAll", error));
 	}
 	
 	public Flux<MessageClientResponse> sendMessageStream() {

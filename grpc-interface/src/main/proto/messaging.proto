@@ -31,6 +31,10 @@ message SenderMessagesPair {
   repeated string messages = 2;
 }
 
+message RecipientsRequest {
+  repeated Person recipients = 1;
+}
+
 message Person {
   string name = 1;
   optional int32 age = 2;
@@ -50,6 +54,9 @@ service MessagingService {
 
   // asynchronous method (client-streaming method): client sends multiple messages and receives a combined response
   rpc collectMessagesBySender(stream MessageRequest) returns (GroupedMessagesResponse);
+
+  // asynchronous method (server-streaming method): client sends a message and receives multiple responses
+  rpc sendMessageToAll(RecipientsRequest) returns (stream MessageResponse);
 
   // asynchronous method (bi-directional): client sends a stream of messages and receives a stream of responses
   rpc sendMessageStream(stream MessageRequest) returns (stream MessageResponse);

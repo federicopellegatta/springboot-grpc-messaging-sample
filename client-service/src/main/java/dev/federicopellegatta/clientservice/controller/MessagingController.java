@@ -31,6 +31,12 @@ public class MessagingController {
 		                            HttpStatus.CREATED);
 	}
 	
+	@PostMapping("/send-to-all")
+	public ResponseEntity<Flux<MessageClientResponse>> sendMessageToAll(
+			@RequestParam(value = "numberOfRecipient", required = false, defaultValue = "3") int numberOfRecipient) {
+		return new ResponseEntity<>(messagingService.sendMessageToAll(numberOfRecipient), HttpStatus.CREATED);
+	}
+	
 	@PostMapping("/send-stream")
 	public ResponseEntity<Flux<MessageClientResponse>> sendMessageStream() {
 		return new ResponseEntity<>(messagingService.sendMessageStream(), HttpStatus.CREATED);
