@@ -6,7 +6,6 @@ import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
 import dev.federicopellegatta.clientservice.service.MessagingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -18,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class MessagingController {
 	private final MessagingService messagingService;
 	
-	@PostMapping(value = "/send", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/send")
 	public ResponseEntity<Mono<MessageClientResponse>> sendMessage(
 			@RequestBody MessageClientRequest messageClientRequest) {
 		return new ResponseEntity<>(messagingService.sendMessage(messageClientRequest), HttpStatus.CREATED);
