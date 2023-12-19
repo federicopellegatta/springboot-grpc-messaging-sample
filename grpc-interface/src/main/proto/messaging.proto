@@ -22,7 +22,7 @@ message MessageResponse {
 
 // Response for client-streaming service
 message GroupedMessagesResponse {
-  repeated SenderMessagesPair senderMessages = 1;
+  repeated SenderMessagesPair sender_messages = 1;
 }
 
 // Pair of sender and messages
