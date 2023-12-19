@@ -6,7 +6,9 @@ import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import utils.TimeUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +66,19 @@ public class MessagingGrpcController extends MessagingServiceGrpc.MessagingServi
 				responseObserver.onCompleted();
 			}
 		};
+	}
+	
+	@Override
+	public void sendMessageToAll(RecipientsRequest request, StreamObserver<MessageResponse> responseObserver) {
+		request.getRecipientsList()
+				.stream()
+				.map(recipient -> MessageResponse.newBuilder()
+						.setRecipient(recipient.getName())
+						.setContent("Hello " + recipient.getName() + ", I'm server!")
+						.setReadTime(TimeUtils.convertToTimestamp(Instant.now()))
+						.build())
+				.forEach(responseObserver::onNext);
+		responseObserver.onCompleted();
 	}
 	
 	@Override

@@ -6,7 +6,6 @@ import dev.federicopellegatta.clientservice.dto.MessagesBySenderResponse;
 import dev.federicopellegatta.clientservice.service.MessagingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,7 @@ import java.util.Collection;
 public class MessagingController {
 	private final MessagingService messagingService;
 	
-	@PostMapping(value = "/send", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/send")
 	public ResponseEntity<MessageClientResponse> sendMessage(@RequestBody MessageClientRequest messageClientRequest) {
 		return new ResponseEntity<>(messagingService.sendMessage(messageClientRequest), HttpStatus.CREATED);
 	}
@@ -29,6 +28,12 @@ public class MessagingController {
 			@RequestParam(value = "numberOfMessages", required = false, defaultValue = "5") int numberOfMessages) {
 		return new ResponseEntity<>(messagingService.collectMessagesBySender(numberOfSenders, numberOfMessages),
 		                            HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/send-to-all")
+	public ResponseEntity<Collection<MessageClientResponse>> sendMessageToAll(
+			@RequestParam(value = "numberOfRecipient", required = false, defaultValue = "3") int numberOfRecipient) {
+		return new ResponseEntity<>(messagingService.sendMessageToAll(numberOfRecipient), HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/send-stream")

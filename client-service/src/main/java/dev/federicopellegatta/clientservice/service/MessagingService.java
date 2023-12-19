@@ -87,6 +87,49 @@ public class MessagingService {
 		return isCountdownComplete ? messagesBySenderResponse : new MessagesBySenderResponse();
 	}
 	
+	
+	public Collection<MessageClientResponse> sendMessageToAll(int numberOfRecipient) {
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		final List<MessageClientResponse> messageClientResponses = new ArrayList<>();
+		
+		StreamObserver<MessageResponse> messageResponseStreamObserver =
+				new StreamObserver<>() {
+					@Override
+					public void onNext(MessageResponse response) {
+						messageClientResponses.add(messageMapper.toClientResponse(response));
+					}
+					
+					@Override
+					public void onError(Throwable throwable) {
+						log.error("Error in sendMessageToAll", throwable);
+						countDownLatch.countDown();
+					}
+					
+					@Override
+					public void onCompleted() {
+						countDownLatch.countDown();
+					}
+				};
+		
+		RecipientsRequest recipientsRequest = RecipientsRequest.newBuilder()
+				.addAllRecipients(IntStream.range(0, numberOfRecipient)
+						                  .mapToObj(i -> new RandomGenerator().person())
+						                  .collect(Collectors.toList()))
+				.build();
+		
+		messagingServiceStub.sendMessageToAll(recipientsRequest, messageResponseStreamObserver);
+		
+		boolean isCountdownComplete = false;
+		try {
+			isCountdownComplete = countDownLatch.await(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			log.error("Countdown was interrupted: " + e.getMessage());
+			// Restore interrupted state...
+			Thread.currentThread().interrupt();
+		}
+		return isCountdownComplete ? messageClientResponses : Collections.emptyList();
+	}
+	
 	public Collection<MessageClientResponse> sendMessageStream() {
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 		
