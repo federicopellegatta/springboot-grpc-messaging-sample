@@ -14,6 +14,6 @@ import java.io.Serializable;
 @Data
 public class PersonClient implements Serializable {
 	private String name;
-	private int age;
+	private Integer age;
 	private Gender gender;
 }
