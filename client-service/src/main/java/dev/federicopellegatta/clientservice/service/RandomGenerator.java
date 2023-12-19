@@ -11,11 +11,13 @@ public class RandomGenerator {
 	private final Faker faker = new Faker();
 	
 	public Person person() {
-		return Person.newBuilder()
-				.setName(faker.name().name())
-				.setAge(age())
-				.setGender(gender())
-				.build();
+		Person.Builder builder = Person.newBuilder()
+				.setName(faker.name().name());
+		
+		if (bool()) builder.setAge(age());
+		if (bool()) builder.setGender(gender());
+		
+		return builder.build();
 	}
 	
 	public String message() {
@@ -27,7 +29,11 @@ public class RandomGenerator {
 	}
 	
 	private Gender gender() {
-		return faker.bool().bool() ? Gender.MALE : Gender.FEMALE;
+		return bool() ? Gender.MALE : Gender.FEMALE;
+	}
+	
+	public static boolean bool() {
+		return new Random().nextBoolean();
 	}
 	
 	public static <T> T pickRandom(List<T> list) {

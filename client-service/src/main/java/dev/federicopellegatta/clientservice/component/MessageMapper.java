@@ -35,19 +35,23 @@ public class MessageMapper {
 	}
 	
 	private Person toPersonServer(PersonClient sender) {
-		return Person.newBuilder()
-				.setName(sender.getName())
-				.setAge(sender.getAge())
-				.setGender(sender.getGender())
-				.build();
+		Person.Builder builder = Person.newBuilder()
+				.setName(sender.getName());
+		
+		if (sender.getAge() != null) builder.setAge(sender.getAge());
+		if (sender.getGender() != null) builder.setGender(sender.getGender());
+		
+		return builder.build();
 	}
 	
 	private PersonClient toPersonClient(Person sender) {
-		return PersonClient.builder()
-				.name(sender.getName())
-				.age(sender.getAge())
-				.gender(sender.getGender())
-				.build();
+		PersonClient.PersonClientBuilder builder = PersonClient.builder()
+				.name(sender.getName());
+		
+		if (sender.hasAge()) builder.age(sender.getAge());
+		if (sender.hasGender()) builder.gender(sender.getGender());
+		
+		return builder.build();
 	}
 	
 	public List<MessagesBySenderResponse.SenderMessagesPairResponse> toClientResponse(
